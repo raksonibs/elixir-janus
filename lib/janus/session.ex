@@ -54,6 +54,25 @@ defmodule Janus.Session do
     end
   end
 
+  def init(url) do
+    case post(url, %{janus: :create}) do
+      {:ok, body} ->
+        id = body.data.id
+        {:ok, event_manager} = GenEvent.start_link()
+
+        session = %Janus.Session{
+          id: id,
+          base_url: "#{url}/#{id}",
+          event_manager: event_manager
+        }
+
+        Agent.start(fn -> session end)
+
+      v ->
+        v
+    end
+  end
+
   @doc "Starts an existing session previously created via `init/1`."
 
   def start(pid) when is_pid(pid), do: poll(pid)
@@ -63,6 +82,17 @@ defmodule Janus.Session do
     cookie = ConCache.get(:room_cache, room_name)
 
     case init(url, room_name, cookie) do
+      {:ok, pid} ->
+        start(pid)
+        {:ok, pid}
+
+      v ->
+        v
+    end
+  end
+
+  def start(url) when is_binary(url) do
+    case init(url) do
       {:ok, pid} ->
         start(pid)
         {:ok, pid}
@@ -238,11 +268,13 @@ defmodule Janus.Session do
   def which_handlers(session), do: Agent.get(session, &GenEvent.which_handlers(&1.event_manager))
 
   defp poll(pid) do
-    IO.inspect "pid in session-janus"
-    IO.inspect pid
+    IO.inspect("pid in session-janus")
+    IO.inspect(pid)
+    IO.inspect("info(pid)")
+    IO.inspect(Process.info(pid))
     session = Agent.get(pid, & &1)
-    IO.inspect "session in session-janus"
-    IO.inspect session
+    IO.inspect("session in session-janus")
+    IO.inspect(session)
 
     spawn(fn ->
       case get(session.base_url, session.cookie) do
