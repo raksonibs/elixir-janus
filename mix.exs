@@ -47,7 +47,7 @@ defmodule Janus.Mixfile do
       {:con_cache, "~> 0.12.0"},
       {:ex_doc, "~> 0.14", only: :dev},
       {:bypass, "~> 0.1", only: :test},
-      {:hackney, "~> 1.13.0"}
+      {:hackney, "~> 1.13.0", override: true}
     ]
   end
 
