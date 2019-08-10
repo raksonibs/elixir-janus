@@ -130,73 +130,75 @@ defmodule Janus.Session do
 
           room_number = ConCache.get(:room_number_cache, room_name)
 
-          room_number = if room_number != nil do
-            room_number =
-              case Janus.Plugin.check_room_exists(
-                     plugin_base_url,
-                     %{
-                       request: "exists",
-                       room: room_number
-                     },
-                     main_cookie
-                   ) do
-                {:ok, %{janus: "success", plugindata: %{data: %{exists: true}}}, _cookie} ->
-                  room_number
+          room_number =
+            if room_number != nil do
+              room_number =
+                case Janus.Plugin.check_room_exists(
+                       plugin_base_url,
+                       %{
+                         request: "exists",
+                         room: room_number
+                       },
+                       main_cookie
+                     ) do
+                  {:ok, %{janus: "success", plugindata: %{data: %{exists: true}}}, _cookie} ->
+                    room_number
 
-                {:ok, %{janus: "success", plugindata: %{data: %{exists: false}}}, _cookie} ->
-                  nil
+                  {:ok, %{janus: "success", plugindata: %{data: %{exists: false}}}, _cookie} ->
+                    nil
 
-                _ ->
-                  Logger.error("Invalid request")
-                  nil
-              end
-          else
-            nil
-          end
+                  _ ->
+                    Logger.error("Invalid request")
+                    nil
+                end
+            else
+              nil
+            end
 
-          plugin = if room_number == nil do
-            IO.puts("Creating new Janus room")
+          plugin =
+            if room_number == nil do
+              IO.puts("Creating new Janus room")
 
-            {:ok, response, _cookie} =
-              Janus.Plugin.create(
-                plugin_base_url,
-                %{
-                  request: "create",
-                  description: room_name,
-                  bitrate: 2_000_000,
-                  videocodec: "h264",
-                  publishers: 20,
-                  permanent: true,
-                  audiolevel_ext: true,
-                  audiolevel_event: true,
-                  audio_active_packets: 100,
-                  audio_level_average: 120
-                },
-                main_cookie
-              )
+              {:ok, response, _cookie} =
+                Janus.Plugin.create(
+                  plugin_base_url,
+                  %{
+                    request: "create",
+                    description: room_name,
+                    bitrate: 2_000_000,
+                    videocodec: "h264",
+                    publishers: 20,
+                    permanent: true,
+                    audiolevel_ext: true,
+                    audiolevel_event: true,
+                    audio_active_packets: 100,
+                    audio_level_average: 120
+                  },
+                  main_cookie
+                )
 
-            room_number = response.plugindata.data.room
+              room_number = response.plugindata.data.room
 
-            ConCache.put(:room_number_cache, room_name, room_number)
+              ConCache.put(:room_number_cache, room_name, room_number)
 
-            %Janus.Plugin{
-              id: id,
-              base_url: plugin_base_url,
-              event_manager: event_manager,
-              cookie: main_cookie,
-              room_number: room_number
-            }
-          else
-            IO.puts("Using existing Janus room")
+              %Janus.Plugin{
+                id: id,
+                base_url: plugin_base_url,
+                event_manager: event_manager,
+                cookie: main_cookie,
+                room_number: room_number
+              }
+            else
+              IO.puts("Using existing Janus room")
 
-            %Janus.Plugin{
-              id: id,
-              base_url: plugin_base_url,
-              event_manager: event_manager,
-              cookie: main_cookie,
-              room_number: room_number
-            }
-          end
+              %Janus.Plugin{
+                id: id,
+                base_url: plugin_base_url,
+                event_manager: event_manager,
+                cookie: main_cookie,
+                room_number: room_number
+              }
+            end
 
           {:ok, plugin_pid} = Agent.start(fn -> plugin end)
 

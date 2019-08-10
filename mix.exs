@@ -6,9 +6,9 @@ defmodule Janus.Mixfile do
       app: :janus,
       version: "0.1.1",
       elixir: "~> 1.3",
-      elixirc_paths: elixirc_paths(Mix.env),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "Janus",
       source_url: "https://github.com/ndarilek/elixir-janus",
@@ -29,7 +29,7 @@ defmodule Janus.Mixfile do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Dependencies can be Hex packages:
   #
@@ -50,5 +50,4 @@ defmodule Janus.Mixfile do
       {:hackney, "~> 1.13.0", override: true}
     ]
   end
-
 end
