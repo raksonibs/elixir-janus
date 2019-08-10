@@ -42,10 +42,12 @@ defmodule Janus.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "~> 0.10"},
-      {:poison, "~> 3.1"},
+      {:httpoison, "~> 1.5.1"},
+      {:poison, "~> 4.0.1"},
+      {:con_cache, "~> 0.12.0"},
       {:ex_doc, "~> 0.14", only: :dev},
-      {:bypass, "~> 0.1", only: :test}
+      {:bypass, "~> 0.1", only: :test},
+      {:hackney, "~> 1.13.0"}
     ]
   end
 
