@@ -216,10 +216,17 @@ defmodule Janus.Session do
                       plugin_pid,
                       &GenEvent.notify(&1.event_manager, {:detached, pid, plugin_pid})
                     )
+
+                  res ->
+                    IO.inspect "data not caught"
+                    IO.inspect res
+                    nil
                 end
               end
 
-            _ ->
+            res ->
+              IO.inspect "base url not caught"
+              IO.inspect res
               nil
           end
 
