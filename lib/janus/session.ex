@@ -146,9 +146,13 @@ defmodule Janus.Session do
   def which_handlers(session), do: Agent.get(session, &GenEvent.which_handlers(&1.event_manager))
 
   defp poll(pid) do
+    IO.inspect "pid"
+    IO.inspect pid
     session = Agent.get(pid, & &1)
 
     spawn(fn ->
+      IO.inspect "session"
+      IO.inspect session
       case get(session.base_url) do
         {:ok, data} ->
           event_manager = session.event_manager
